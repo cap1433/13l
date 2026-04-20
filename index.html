@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13L Game – Win Big Every Day!</title>
+<link rel="icon" href="https://i.ibb.co/6Rg8MWNs/x.jpg" type="image/jpeg">
+<link rel="shortcut icon" href="https://i.ibb.co/6Rg8MWNs/x.jpg" type="image/jpeg">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@500;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #FFD700;
+    --deep-gold: #B8860B;
+    --red: #CC1100;
+    --dark-red: #7A0000;
+    --orange: #FF6600;
+    --bg-dark: #0A0000;
+    --coin: #FFC200;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-dark);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ===== FIRE PARTICLE CANVAS ===== */
+  #fireCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+
+  /* ===== FLOATING COINS ===== */
+  .coin-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+  .coin-particle {
+    position: absolute;
+    font-size: 22px;
+    animation: coinFall linear infinite;
+    opacity: 0.7;
+  }
+  @keyframes coinFall {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    background: linear-gradient(180deg, rgba(10,0,0,0.98) 0%, rgba(90,0,0,0.85) 100%);
+    border-bottom: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 28px;
+    box-shadow: 0 4px 30px rgba(255,100,0,0.4);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo img {
+    width: 52px; height: 52px; border-radius: 12px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 14px var(--gold);
+  }
+  .nav-logo span {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    background: linear-gradient(90deg, #FFD700, #FF6600, #FFD700);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  .nav-register {
+    background: linear-gradient(135deg, #FFD700, #FF6600);
+    color: #1a0000;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 900;
+    padding: 10px 24px;
+    border: none; border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255,200,0,0.6);
+    animation: navPulse 2s ease-in-out infinite;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: transform 0.2s;
+  }
+  .nav-register:hover { transform: scale(1.08); }
+  @keyframes navPulse {
+    0%,100% { box-shadow: 0 0 20px rgba(255,200,0,0.6); }
+    50% { box-shadow: 0 0 40px rgba(255,140,0,0.9); }
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative; z-index: 2;
+    padding: 70px 0 0;
+  }
+
+  .jili-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #7A0000, #CC1100);
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 6px;
+    padding: 6px 28px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 20px rgba(255,200,0,0.4);
+    animation: badgeGlow 2.5s ease-in-out infinite;
+  }
+  @keyframes badgeGlow {
+    0%,100% { box-shadow: 0 0 15px rgba(255,200,0,0.4); }
+    50% { box-shadow: 0 0 35px rgba(255,200,0,0.9); }
+  }
+
+  .hero-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(5rem, 20vw, 12rem);
+    font-weight: 900;
+    line-height: 0.9;
+    background: linear-gradient(180deg, #FFD700 0%, #FF6600 45%, #CC1100 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 0 30px rgba(255,100,0,0.7));
+    animation: titleFlicker 4s ease-in-out infinite;
+    letter-spacing: -2px;
+  }
+  @keyframes titleFlicker {
+    0%,100% { filter: drop-shadow(0 0 30px rgba(255,100,0,0.7)); }
+    50% { filter: drop-shadow(0 0 60px rgba(255,200,0,1)); }
+  }
+
+  .hero-subtitle {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.2rem, 4vw, 2.2rem);
+    color: #fff;
+    letter-spacing: 8px;
+    margin-top: 8px;
+    text-shadow: 0 0 20px rgba(255,100,0,0.8);
+  }
+
+  /* ===== BONUS STRIP ===== */
+  .bonus-strip {
+    position: relative; z-index: 2;
+    background: linear-gradient(90deg, #7A0000, #CC1100, #FF6600, #CC1100, #7A0000);
+    border-top: 2px solid var(--gold);
+    border-bottom: 2px solid var(--gold);
+    padding: 16px 0;
+    overflow: hidden;
+    margin-top: -10px;
+  }
+  .bonus-scroll {
+    display: flex; gap: 60px;
+    animation: scrollText 18s linear infinite;
+    white-space: nowrap;
+  }
+  .bonus-scroll span {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  @keyframes scrollText {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ===== PROMO IMAGE SECTION ===== */
+  .promo-section {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: center;
+    padding: 50px 20px 30px;
+  }
+  .promo-img-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .promo-img-wrap img {
+    width: min(300px, 75vw);     /* ← Size exactly jaise circle mark kiya tha */
+    border-radius: 40px;         /* ← Side wala curve exactly jaise red mark kiya tha */
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 60px rgba(255,150,0,0.6), 0 0 120px rgba(200,50,0,0.3);
+    animation: imgFloat 3s ease-in-out infinite;
+  }
+  @keyframes imgFloat {
+    0%,100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-12px) scale(1.02); }
+  }
+  .promo-glow-ring {
+    position: absolute; inset: -15px;
+    border-radius: 50px;
+    border: 2px solid rgba(255,200,0,0.3);
+    animation: ringPulse 2s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%,100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.05); opacity: 1; }
+  }
+
+  /* ===== BONUS CARD ===== */
+  .bonus-card {
+    position: relative; z-index: 2;
+    background: linear-gradient(135deg, rgba(120,0,0,0.8), rgba(30,0,0,0.9));
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    margin: 12px auto;
+    max-width: 500px;
+    padding: 14px 20px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255,150,0,0.35);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;
+  }
+  .bonus-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: #FF6600;
+    text-transform: uppercase;
+  }
+  .bonus-amount {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.8rem, 7vw, 2.8rem);
+    font-weight: 900;
+    background: linear-gradient(90deg, #FFD700, #FF6600, #FFD700);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shimmer 2s linear infinite;
+    background-size: 200% auto;
+    line-height: 1;
+  }
+  @keyframes shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+  .bonus-desc {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.75);
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+  .coins-row {
+    font-size: 2.2rem;
+    margin-top: 12px;
+    animation: coinBounce 1.5s ease-in-out infinite;
+  }
+  @keyframes coinBounce {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  /* ===== GAMES STRIP ===== */
+  .games-section {
+    position: relative; z-index: 2;
+    padding: 30px 20px;
+    text-align: center;
+  }
+  .section-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    background: linear-gradient(90deg, #FFD700, #FF6600);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 4px;
+    margin-bottom: 28px;
+  }
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 14px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .game-card {
+    background: linear-gradient(135deg, rgba(150,10,0,0.7), rgba(20,0,0,0.9));
+    border: 1px solid rgba(255,200,0,0.5);
+    border-radius: 14px;
+    padding: 20px 10px;
+    font-size: 2.2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .game-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,200,0,0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .game-card:hover { transform: translateY(-6px) scale(1.05); border-color: var(--gold); box-shadow: 0 10px 40px rgba(255,150,0,0.5); }
+  .game-card:hover::before { opacity: 1; }
+  .game-card span {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  /* ===== CTA BUTTONS ===== */
+  .cta-section {
+    position: relative; z-index: 2;
+    padding: 10px 20px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+
+  .btn-community {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    background: linear-gradient(135deg, #1A8FE3, #0D5FA0);
+    border: 2px solid #5BC8FF;
+    border-radius: 50px;
+    padding: 13px 0;
+    width: 100%; max-width: 420px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 0 24px rgba(30,150,255,0.5);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    letter-spacing: 1.5px;
+  }
+  .btn-community:hover { transform: scale(1.04); box-shadow: 0 0 40px rgba(30,150,255,0.8); }
+  .tg-icon {
+    width: 28px; height: 28px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .tg-icon svg { width: 18px; height: 18px; }
+
+  .btn-register {
+    display: block;
+    background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #CC1100 100%);
+    border: none;
+    border-radius: 50px;
+    padding: 16px 0;
+    width: 100%; max-width: 420px;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #1a0000;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-decoration: none;
+    box-shadow: 0 0 40px rgba(255,150,0,0.7), 0 8px 30px rgba(0,0,0,0.4);
+    animation: registerPulse 1.8s ease-in-out infinite;
+    transition: transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .btn-register::before {
+    content: '';
+    position: absolute; top: -50%; left: -60%;
+    width: 40%; height: 200%;
+    background: rgba(255,255,255,0.3);
+    transform: skewX(-20deg);
+    animation: shine 3s linear infinite;
+  }
+  @keyframes shine {
+    0% { left: -60%; }
+    100% { left: 160%; }
+  }
+  .btn-register:hover { transform: scale(1.06); }
+  @keyframes registerPulse {
+    0%,100% { box-shadow: 0 0 40px rgba(255,150,0,0.7), 0 8px 30px rgba(0,0,0,0.4); }
+    50% { box-shadow: 0 0 70px rgba(255,200,0,1), 0 8px 30px rgba(0,0,0,0.4); }
+  }
+
+  .reg-note { display: none; }
+
+  /* ===== FEATURES ===== */
+  .features {
+    position: relative; z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    max-width: 750px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+  .feat-card {
+    background: linear-gradient(135deg, rgba(100,5,0,0.6), rgba(15,0,0,0.8));
+    border: 1px solid rgba(255,180,0,0.4);
+    border-radius: 16px;
+    padding: 24px 18px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .feat-card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(255,100,0,0.3); }
+  .feat-icon { font-size: 2.5rem; margin-bottom: 10px; }
+  .feat-title { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--gold); letter-spacing: 1px; margin-bottom: 6px; }
+  .feat-desc { font-size: 0.85rem; color: rgba(255,255,255,0.65); line-height: 1.5; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    position: relative; z-index: 2;
+    background: rgba(10,0,0,0.95);
+    border-top: 2px solid rgba(255,200,0,0.3);
+    text-align: center;
+    padding: 28px 20px;
+    margin-top: 40px;
+  }
+  footer p { font-size: 0.78rem; color: rgba(255,200,0,0.4); letter-spacing: 1px; line-height: 1.8; }
+
+  /* ===== LIGHTNING OVERLAY ===== */
+  .lightning {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+    opacity: 0;
+    background: radial-gradient(ellipse at 80% 20%, rgba(100,100,255,0.15), transparent 60%);
+    animation: lightningFlash 8s ease-in-out infinite;
+  }
+  @keyframes lightningFlash {
+    0%,100% { opacity: 0; }
+    94% { opacity: 0; }
+    95% { opacity: 1; }
+    96% { opacity: 0; }
+    97% { opacity: 0.5; }
+    98% { opacity: 0; }
+  }
+
+  /* ===== DRAGON DECORATION ===== */
+  .dragon-left, .dragon-right {
+    position: fixed;
+    top: 50%; transform: translateY(-50%);
+    font-size: 7rem;
+    opacity: 0.07;
+    pointer-events: none;
+    z-index: 1;
+    animation: dragonFloat 6s ease-in-out infinite;
+  }
+  .dragon-left { left: -20px; animation-delay: 0s; }
+  .dragon-right { right: -20px; animation-delay: 3s; transform: translateY(-50%) scaleX(-1); }
+  @keyframes dragonFloat {
+    0%,100% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-60%) scale(1.05); }
+  }
+
+  /* responsive */
+  @media(max-width:480px) {
+    .nav-logo span { font-size: 1.1rem; }
+    .nav-register { padding: 9px 16px; font-size: 0.72rem; }
+    .btn-register { padding: 18px 36px; font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Fire Canvas -->
+<canvas id="fireCanvas"></canvas>
+<!-- Lightning -->
+<div class="lightning"></div>
+<!-- Dragon decorations -->
+<div class="dragon-left">🐉</div>
+<div class="dragon-right">🐉</div>
+
+<!-- Coin Rain -->
+<div class="coin-rain" id="coinRain"></div>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="nav-logo">
+    <img src="https://i.ibb.co/6Rg8MWNs/x.jpg" alt="13L Game" onerror="this.style.display='none'">
+  </div>
+  <button class="nav-register" onclick="alert('Registration opening soon!')">🎰 Register Now</button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero"></section>
+
+<!-- ===== BONUS STRIP ===== -->
+<div class="bonus-strip">
+  <div class="bonus-scroll">
+    <span>🎰 Daily Jackpot Win &nbsp;•&nbsp;</span>
+    <span>💰 ₹500 Welcome Bonus &nbsp;•&nbsp;</span>
+    <span>🐉 Dragon Fortune &nbsp;•&nbsp;</span>
+    <span>🃏 Live Casino &nbsp;•&nbsp;</span>
+    <span>⚡ Instant Withdrawal &nbsp;•&nbsp;</span>
+    <span>🎲 24/7 Games &nbsp;•&nbsp;</span>
+    <span>🎰 Daily Jackpot Win &nbsp;•&nbsp;</span>
+    <span>💰 ₹500 Welcome Bonus &nbsp;•&nbsp;</span>
+    <span>🐉 Dragon Fortune &nbsp;•&nbsp;</span>
+    <span>🃏 Live Casino &nbsp;•&nbsp;</span>
+    <span>⚡ Instant Withdrawal &nbsp;•&nbsp;</span>
+    <span>🎲 24/7 Games &nbsp;•&nbsp;</span>
+  </div>
+</div>
+
+<!-- ===== PROMO IMAGE ===== -->
+<div class="promo-section">
+  <div class="promo-img-wrap">
+    <img src="https://i.ibb.co/6Rg8MWNs/x.jpg" alt="13L Game – Win Big">
+    <div class="promo-glow-ring"></div>
+  </div>
+</div>
+
+<!-- ===== BONUS CARD ===== -->
+<div class="bonus-card">
+  <div class="coins-row" style="font-size:1.6rem;margin:0;">🎁</div>
+  <div>
+    <div class="bonus-label">Welcome Bonus</div>
+    <div class="bonus-amount">₹500</div>
+  </div>
+  <div class="bonus-desc" style="font-size:0.8rem;color:rgba(255,255,255,0.65);margin:0;">New players ke liye<br>No deposit required!</div>
+</div>
+
+<!-- ===== CTA ===== -->
+<div class="cta-section">
+  <!-- JOIN COMMUNITY -->
+  <a href="https://t.me/earningwith_ayush" class="btn-community">
+    <div class="tg-icon">
+      <svg viewBox="0 0 24 24" fill="#1A8FE3" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617 5.32 12.69c-.656-.204-.669-.656.136-.974l10.208-3.934c.549-.204 1.026.12.23.439z"/>
+      </svg>
+    </div>
+    Join Our Community
+  </a>
+
+  <!-- REGISTER MAIN -->
+  <a href="#" class="btn-register" onclick="alert('Registration opening soon!')">
+    🎰 ABHI REGISTER KARO
+  </a>
+  <div class="reg-note">✨ FREE • INSTANT • ₹500 BONUS GUARANTEED ✨</div>
+</div>
+
+<!-- ===== GAMES ===== -->
+<div class="games-section">
+  <div class="section-title">🎮 Popular Games</div>
+  <div class="games-grid">
+    <div class="game-card">🎰<span>Slots</span></div>
+    <div class="game-card">🎴<span>Teen Patti</span></div>
+    <div class="game-card">🃏<span>Poker</span></div>
+    <div class="game-card">🎲<span>Rummy</span></div>
+    <div class="game-card">🐉<span>Dragon Tiger</span></div>
+    <div class="game-card">🎱<span>Lotto</span></div>
+  </div>
+</div>
+
+<!-- ===== FEATURES ===== -->
+<div class="features">
+  <div class="feat-card">
+    <div class="feat-icon">⚡</div>
+    <div class="feat-title">Instant Pay</div>
+    <div class="feat-desc">Seconds mein withdrawal, koi delay nahi</div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon">🔒</div>
+    <div class="feat-title">100% Secure</div>
+    <div class="feat-desc">Bank-level encryption se protected</div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon">🏆</div>
+    <div class="feat-title">Daily Jackpot</div>
+    <div class="feat-desc">Har din jeeto mega prizes aur bonuses</div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon">📱</div>
+    <div class="feat-title">Mobile Ready</div>
+    <div class="feat-desc">Kisi bhi device pe khelein, kabhi bhi</div>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <p>⚠️ 18+ Only • Please gamble responsibly • Terms & Conditions Apply</p>
+  <p style="margin-top:8px;">© 2026 13L Game – All Rights Reserved</p>
+</footer>
+
+<script>
+// ===== FIRE PARTICLES =====
+const canvas = document.getElementById('fireCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+const particles = [];
+function createParticle() {
+  return {
+    x: Math.random() * canvas.width,
+    y: canvas.height + 10,
+    vx: (Math.random() - 0.5) * 1.5,
+    vy: -(Math.random() * 3 + 2),
+    life: 1,
+    decay: Math.random() * 0.012 + 0.006,
+    size: Math.random() * 18 + 6,
+    hue: Math.random() * 40 + 10
+  };
+}
+for (let i = 0; i < 180; i++) {
+  const p = createParticle();
+  p.y = Math.random() * canvas.height;
+  p.life = Math.random();
+  particles.push(p);
+}
+function drawFire() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${p.hue}, 100%, ${50 + p.life * 30}%, ${p.life * 0.55})`;
+    ctx.fill();
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+    p.size *= 0.997;
+    if (p.life <= 0) { Object.assign(particles[i], createParticle()); }
+  }
+  requestAnimationFrame(drawFire);
+}
+drawFire();
+
+// ===== COIN RAIN =====
+const coinRain = document.getElementById('coinRain');
+const coinSymbols = ['₹','💰','🪙','💵'];
+for (let i = 0; i < 22; i++) {
+  const coin = document.createElement('div');
+  coin.className = 'coin-particle';
+  coin.textContent = coinSymbols[Math.floor(Math.random() * coinSymbols.length)];
+  coin.style.left = Math.random() * 100 + 'vw';
+  coin.style.animationDuration = (Math.random() * 5 + 6) + 's';
+  coin.style.animationDelay = (Math.random() * 10) + 's';
+  coin.style.fontSize = (Math.random() * 16 + 14) + 'px';
+  coinRain.appendChild(coin);
+}
+</script>
+</body>
+</html>
